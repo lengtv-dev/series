@@ -1,0 +1,6 @@
+{
+  "name": "Thai Series M3U Harvester",
+  "description": "ระบบดึงข้อมูลจากเว็บไซต์ดูซีรีย์ยอดนิยม แปลงเป็น M3U Playlist สำหรับดูตอนทั้งหมดแบบ Full Episodes",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
