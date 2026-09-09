@@ -334,7 +334,7 @@ export default function SeriesHarvesterPage() {
   const [totalEpisodes123, setTotalEpisodes123] = useState<number>(6);
   const [title123, setTitle123] = useState<string>("A Knight of the Seven Kingdoms");
   const [slug123, setSlug123] = useState<string>("a-lover-in-the-mortal-world");
-  const [poster123, setPoster123] = useState<string>("https://parser-xi.vercel.app/wp-content/uploads/2026/01/A-Knight-of-the-Seven-Kingdoms-2026-300x450.jpg");
+  const [poster123, setPoster123] = useState<string>("https://www.seriedayz.com/wp-content/uploads/2026/01/A-Knight-of-the-Seven-Kingdoms-2026-240x300.jpg");
   const [synopsis123, setSynopsis123] = useState<string>("Genres: ซีรี่ย์ซับไทย, ซีรี่ย์ใหม่ 2026, ซีรี่ย์พากย์ไทย, ซีรี่ย์ฝรั่ง, Action บู๊, Drama ชีวิต, Fantasy แฟนตาซี");
   const [seriesList123, setSeriesList123] = useState<SeriesData[]>([]);
 
