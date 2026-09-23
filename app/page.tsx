@@ -320,8 +320,8 @@ export default function SeriesHarvesterPage() {
 
   // 123HDTV Scraper states & inputs
   const [scrapperMode123, setScrapperMode123] = useState<"category" | "single_post">("category");
-  const [categoryUrl123, setCategoryUrl123] = useState<string>("https://www.123-hdx.com/%e0%b8%ab%e0%b8%99%e0%b8%b1%e0%b8%87%e0%b9%83%e0%b8%ab%e0%b8%a1%e0%b9%88-2026");
-  const [categoryType123, setCategoryType123] = useState<string>("https://www.123-hdx.com/%e0%b8%ab%e0%b8%99%e0%b8%b1%e0%b8%87%e0%b9%83%e0%b8%ab%e0%b8%a1%e0%b9%88-2026");
+  const [categoryUrl123, setCategoryUrl123] = useState<string>("https://www.123-hda.com/%e0%b8%ab%e0%b8%99%e0%b8%b1%e0%b8%87%e0%b9%83%e0%b8%ab%e0%b8%a1%e0%b9%88-2026");
+  const [categoryType123, setCategoryType123] = useState<string>("https://www.123-hda.com/%e0%b8%ab%e0%b8%99%e0%b8%b1%e0%b8%87%e0%b9%83%e0%b8%ab%e0%b8%a1%e0%b9%88-2026");
   const [startPage123, setStartPage123] = useState<number>(1);
   const [endPage123, setEndPage123] = useState<number>(1);
   const [separateMoviesAndSeries123, setSeparateMoviesAndSeries123] = useState<boolean>(true);
@@ -1128,8 +1128,8 @@ export default function SeriesHarvesterPage() {
   // 123HDTV Fetcher for manual single_post mode
   const getM3U8From123HD = async (postId: number, episode: number, nonce: string): Promise<string | null> => {
     return await requestPlayerStream123({
-      targetOrigin: "https://www.123-hdx.com",
-      referer: "https://www.123-hdx.com/",
+      targetOrigin: "https://www.123-hda.com",
+      referer: "https://www.123-hda.com/",
       action: "halim_ajax_player",
       nonce: nonce || "f597124a37",
       episode: String(episode),
@@ -1222,10 +1222,10 @@ export default function SeriesHarvesterPage() {
       const timeday = `วันที่ ${now.getDate()} ${thaiMonths[now.getMonth() + 1]} ${now.getFullYear() + 543}`;
 
       // URL decomposition
-      let referer = "https://www.123-hdx.com/";
-      let hostOrigin = "https://www.123-hdx.com";
+      let referer = "https://www.123-hda.com/";
+      let hostOrigin = "https://www.123-hda.com";
       let fname = "หนังใหม่-2026";
-      let wname = "123-hdx";
+      let wname = "123-hda";
 
       try {
         const parsed = new URL(web_movie);
@@ -4314,15 +4314,15 @@ export default function SeriesHarvesterPage() {
                           }}
                           className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-1.5 text-[#58A6FF] text-xs font-mono focus:outline-none focus:border-[#58A6FF] bg-opacity-50 font-semibold cursor-pointer"
                         >
-                          <option value="https://www.123-hdx.com/%e0%b8%ab%e0%b8%99%e0%b8%b1%e0%b8%87%e0%b9%83%e0%b8%ab%e0%b8%a1%e0%b9%88-2026">🎬 หนังใหม่ 2026 (123-hdx.com - ตามสคริปต์ Python)</option>
-                          <option value="https://www.123-hdx.com/หนังใหม่-2025">🎬 หนังใหม่ 2025 (123-hdx.com)</option>
-                          <option value="https://www.123-hdx.com/ดูหนังออนไลน์/หนังไทย">🇹🇭 หนังไทย (123-hdx.com)</option>
-                          <option value="https://www.123-hdx.com/ดูหนังออนไลน์/ซีรี่ย์ไทย">🇹🇭 ซีรี่ย์ไทย (123-hdx.com)</option>
-                          <option value="https://www.123-hdx.com/ดูหนังออนไลน์/หนังจีน">🇨🇳 หนังจีน (123-hdx.com)</option>
-                          <option value="https://www.123-hdx.com/ดูหนังออนไลน์/ซีรี่ย์จีน">🇨🇳 ซีรี่ย์จีน (123-hdx.com)</option>
-                          <option value="https://www.123-hdx.com/ดูหนังออนไลน์/หนังฝรั่ง">🇺🇸 หนังฝรั่ง (123-hdx.com)</option>
-                          <option value="https://www.123-hdx.com/ดูหนังออนไลน์/ซีรี่ย์ฝรั่ง">🇺🇸 ซีรี่ย์ฝรั่ง (123-hdx.com)</option>
-                          <option value="https://www.123-hdx.com/ดูหนังออนไลน์/ซีรี่ย์เกาหลี">🇰🇷 ซีรี่ย์เกาหลี (123-hdx.com)</option>
+                          <option value="https://www.123-hda.com/%e0%b8%ab%e0%b8%99%e0%b8%b1%e0%b8%87%e0%b8%ab%e0%b8%a1%e0%b9%88-2026">🎬 หนังใหม่ 2026 (123-hda.com - ตามสคริปต์ Python)</option>
+                          <option value="https://www.123-hda.com/หนังใหม่-2025">🎬 หนังใหม่ 2025 (123-hda.com)</option>
+                          <option value="https://www.123-hda.com/ดูหนังออนไลน์/หนังไทย">🇹🇭 หนังไทย (123-hda.com)</option>
+                          <option value="https://www.123-hda.com/ดูหนังออนไลน์/ซีรี่ย์ไทย">🇹🇭 ซีรี่ย์ไทย (123-hda.com)</option>
+                          <option value="https://www.123-hda.com/ดูหนังออนไลน์/หนังจีน">🇨🇳 หนังจีน (123-hda.com)</option>
+                          <option value="https://www.123-hda.com/ดูหนังออนไลน์/ซีรี่ย์จีน">🇨🇳 ซีรี่ย์จีน (123-hda.com)</option>
+                          <option value="https://www.123-hda.com/ดูหนังออนไลน์/หนังฝรั่ง">🇺🇸 หนังฝรั่ง (123-hda.com)</option>
+                          <option value="https://www.123-hda.com/ดูหนังออนไลน์/ซีรี่ย์ฝรั่ง">🇺🇸 ซีรี่ย์ฝรั่ง (123-hda.com)</option>
+                          <option value="https://www.123-hda.com/ดูหนังออนไลน์/ซีรี่ย์เกาหลี">🇰🇷 ซีรี่ย์เกาหลี (123-hda.com)</option>
                           <option value="https://www.123hdtv.com/ดูหนังออนไลน์/หนังไทย">🇹🇭 หนังไทย (123hdtv.com)</option>
                           <option value="https://www.123hdtv.com/ดูหนังออนไลน์/ซีรี่ย์ไทย">🇹🇭 ซีรี่ย์ไทย (123hdtv.com)</option>
                           <option value="custom">✏️ กำหนด URL เอง (Custom URL)</option>
@@ -4339,7 +4339,7 @@ export default function SeriesHarvesterPage() {
                             setCategoryUrl123(e.target.value);
                             setCategoryType123("custom");
                           }}
-                          placeholder="เช่น https://www.123-hdx.com/หนังใหม่-2026"
+                          placeholder="เช่น https://www.123-hda.com/หนังใหม่-2026"
                           className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-1.5 text-white text-xs font-mono focus:outline-none focus:border-[#58A6FF]"
                         />
                       </div>

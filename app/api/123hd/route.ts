@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const targetUrlStr = searchParams.get("url") || "https://www.123-hdx.com/api/get.php";
+  const targetUrlStr = searchParams.get("url") || "https://www.123-hda.com/api/get.php";
 
   try {
     const targetUrl = new URL(targetUrlStr);
