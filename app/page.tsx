@@ -347,8 +347,8 @@ export default function SeriesHarvesterPage() {
   const [skipUnfinishedWow, setSkipUnfinishedWow] = useState<boolean>(false);
   const [seriesListWow, setSeriesListWow] = useState<SeriesData[]>([]);
 
-  // SerieDays Scraper states & inputs
-  const [categoryUrlSerieDays, setCategoryUrlSerieDays] = useState<string>("https://www.seriedays.com/%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B9%8C%E0%B8%9E%E0%B8%B2%E0%B8%81%E0%B8%A2%E0%B9%8C%E0%B9%84%E0%B8%97%E0%B8%A2/");
+  // SerieDays / SerieDayz Scraper states & inputs
+  const [categoryUrlSerieDays, setCategoryUrlSerieDays] = useState<string>("https://www.seriedayz.com/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b9%88%e0%b8%a2%e0%b9%8c%e0%b9%83%e0%b8%ab%e0%b8%a1%e0%b9%88-2026/");
   const [startPageSerieDays, setStartPageSerieDays] = useState<number>(1);
   const [endPageSerieDays, setEndPageSerieDays] = useState<number>(2);
   const [seriesListSerieDays, setSeriesListSerieDays] = useState<SeriesData[]>([]);
@@ -2702,9 +2702,10 @@ export default function SeriesHarvesterPage() {
     }
   };
 
-  const fetchSerieDaysAjaxPost = async (formData: Record<string, any>) => {
+  const fetchSerieDaysAjaxPost = async (formData: Record<string, any>, host = "https://www.seriedayz.com") => {
     try {
-      const res = await fetch(`/api/seriedays`, {
+      const targetApi = `${host.replace(/\/+$/, "")}/api/get.php`;
+      const res = await fetch(`/api/seriedays?url=${encodeURIComponent(targetApi)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -2727,7 +2728,13 @@ export default function SeriesHarvesterPage() {
       setLogs([]);
     }
 
-    addLog(`🚀 เริ่มขุดข้อมูล SerieDays (seriedays.com)... [หน้า ${startPageSerieDays} - ${endPageSerieDays}] [หมวดหมู่: ${categoryUrlSerieDays}]`, "success");
+    let hostOrigin = "https://www.seriedayz.com";
+    try {
+      const parsed = new URL(categoryUrlSerieDays);
+      hostOrigin = `${parsed.protocol}//${parsed.host}`;
+    } catch {}
+
+    addLog(`🚀 เริ่มขุดข้อมูล SerieDays/SerieDayz (${hostOrigin})... [หน้า ${startPageSerieDays} - ${endPageSerieDays}] [หมวดหมู่: ${categoryUrlSerieDays}]`, "success");
 
     let totalSaved = 0;
 
@@ -2741,7 +2748,7 @@ export default function SeriesHarvesterPage() {
 
       addLog(`📂 [Page ${page}/${endPageSerieDays}] กำลังโหลดหน้า: ${pageUrl}`, "info");
 
-      const html = await fetchSerieDaysProxy(pageUrl, "https://www.seriedays.com/");
+      const html = await fetchSerieDaysProxy(pageUrl, `${hostOrigin}/`);
       if (!html) {
         addLog(`⚠️ ไม่สามารถดึงข้อมูลหน้า ${page} ได้`, "warn");
         continue;
@@ -2825,7 +2832,7 @@ export default function SeriesHarvesterPage() {
 
             if (!optVal) continue;
 
-            const epPageUrl = optVal.startsWith("http") ? optVal : `https://www.seriedays.com/${optVal.replace(/^\//, "")}`;
+            const epPageUrl = optVal.startsWith("http") ? optVal : `${hostOrigin.replace(/\/+$/, "")}/${optVal.replace(/^\//, "")}`;
 
             const epHtml = await fetchSerieDaysProxy(epPageUrl, purl);
             if (!epHtml) continue;
@@ -2853,7 +2860,7 @@ export default function SeriesHarvesterPage() {
                   postid,
                   lang: defaultOption,
                   server
-                });
+                }, hostOrigin);
 
                 if (ajaxHtml) {
                   const ajaxDoc = parser.parseFromString(ajaxHtml, "text/html");
@@ -5085,11 +5092,15 @@ export default function SeriesHarvesterPage() {
                         }}
                         className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-1.5 text-[#58A6FF] text-xs font-mono focus:outline-none focus:border-[#58A6FF] bg-opacity-50 font-semibold"
                       >
-                        <option value="https://www.seriedays.com/%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B9%8C%E0%B8%9E%E0%B8%B2%E0%B8%81%E0%B8%A2%E0%B9%8C%E0%B9%84%E0%B8%97%E0%B8%A2/">🇹🇭 ซีรี่ย์พากย์ไทย (Thai Dubbed)</option>
-                        <option value="https://www.seriedays.com/%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B9%8C%E0%B8%8B%E0%B8%B1%E0%B8%9A%E0%B9%84%E0%B8%97%E0%B8%A2/">💬 ซีรี่ย์ซับไทย (Thai Subbed)</option>
-                        <option value="https://www.seriedays.com/%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B9%8C%E0%B8%88%E0%B8%B5%E0%B8%99/">🇨🇳 ซีรี่ย์จีน (China Series)</option>
-                        <option value="https://www.seriedays.com/%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B9%8C%E0%B9%80%E0%B8%81%E0%B8%B2%E0%B8%AB%E0%B8%A5%E0%B8%B5/">🇰🇷 ซีรี่ย์เกาหลี (Korea Series)</option>
-                        <option value="https://www.seriedays.com/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b9%88%e0%b8%a2%e0%b9%8c%e0%b8%9d%e0%b8%a3%e0%b8%b1%e0%b9%88%e0%b8%87/">🇺🇸 ซีรี่ย์ฝรั่ง (Inter Series)</option>
+                        <option value="https://www.seriedayz.com/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b9%88%e0%b8%a2%e0%b9%8c%e0%b9%83%e0%b8%ab%e0%b8%a1%e0%b9%88-2026/">🎬 ซีรี่ย์ใหม่ 2026 (seriedayz.com - ล่าสุด)</option>
+                        <option value="https://www.seriedayz.com/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b9%88%e0%b8%a2%e0%b9%8c%e0%b9%83%e0%b8%ab%e0%b8%a1%e0%b9%88-2025/">🎬 ซีรี่ย์ใหม่ 2025 (seriedayz.com)</option>
+                        <option value="https://www.seriedayz.com/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b9%88%e0%b8%a2%e0%b9%8c%e0%b8%9e%e0%b8%b2%e0%b8%81%e0%b8%a2%e0%b9%8c%e0%b9%84%e0%b8%97%e0%b8%a2/">🇹🇭 ซีรี่ย์พากย์ไทย (seriedayz.com)</option>
+                        <option value="https://www.seriedayz.com/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b9%88%e0%b8%a2%e0%b9%8c%e0%b8%8b%e0%b8%b1%e0%b8%9a%e0%b9%84%e0%b8%97%e0%b8%a2/">💬 ซีรี่ย์ซับไทย (seriedayz.com)</option>
+                        <option value="https://www.seriedayz.com/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b9%88%e0%b8%a2%e0%b9%8c%e0%b8%88%e0%b8%b5%e0%b8%99/">🇨🇳 ซีรี่ย์จีน (seriedayz.com)</option>
+                        <option value="https://www.seriedayz.com/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b9%88%e0%b8%a2%e0%b9%8c%e0%b9%80%e0%b8%81%e0%b8%b2%e0%b8%ab%e0%b8%a5%e0%b8%b5/">🇰🇷 ซีรี่ย์เกาหลี (seriedayz.com)</option>
+                        <option value="https://www.seriedayz.com/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b9%88%e0%b8%a2%e0%b9%8c%e0%b8%9d%e0%b8%a3%e0%b8%b1%e0%b9%88%e0%b8%87/">🇺🇸 ซีรี่ย์ฝรั่ง (seriedayz.com)</option>
+                        <option value="https://www.seriedays.com/%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B9%8C%E0%B8%9E%E0%B8%B2%E0%B8%81%E0%B8%A2%E0%B9%8C%E0%B9%84%E0%B8%97%E0%B8%A2/">🇹🇭 ซีรี่ย์พากย์ไทย (seriedays.com mirror)</option>
+                        <option value="https://www.seriedays.com/%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B9%8C%E0%B8%88%E0%B8%B5%E0%B8%99/">🇨🇳 ซีรี่ย์จีน (seriedays.com mirror)</option>
                       </select>
                       <input
                         type="text"
