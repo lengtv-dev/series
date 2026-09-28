@@ -3527,14 +3527,14 @@ export default function SeriesHarvesterPage() {
         const storyEl = detailDoc.querySelector("div.story") || detailDoc.querySelector("div[itemprop='description']");
         const synopsis = storyEl?.textContent?.trim() || `แหล่งข้อมูล: moviesdoofree.com`;
 
-        // Extract video iframe stream (m3u8haha.com)
+        // Extract video iframe stream (m3u8data.com)
         let streamUrl = "";
         const iframes = Array.from(detailDoc.querySelectorAll("iframe"));
         for (const iframe of iframes) {
           const src = iframe.getAttribute("src") || iframe.getAttribute("data-src") || "";
           const vidMatch = src.match(/vid=([A-Z0-9]+)/i);
           if (vidMatch && vidMatch[1]) {
-            streamUrl = `https://m3u8haha.com/movie/${vidMatch[1]}.mp4/playlist.m3u8`;
+            streamUrl = `https://m3u8data.com/movie/${vidMatch[1]}.mp4/playlist.m3u8`;
             break;
           }
         }
@@ -5487,10 +5487,31 @@ if __name__ == "__main__":
               {/* MoviesDooFree Configuration Forms */}
               {activeTab === "moviesdoofree" && (
                 <div className="flex flex-col gap-4 pt-1 font-mono">
+                  <div className="flex flex-col gap-1.5 pb-2 border-b border-[#2D333B]/60">
+                    <label className="text-[10px] text-gray-400 font-mono uppercase tracking-wider flex items-center justify-between">
+                      <span>หมวดหมู่เป้าหมาย (Category Preset)</span>
+                      <span className="text-amber-400 font-semibold">MOVIESDOOFREE.COM</span>
+                    </label>
+                    <select
+                      disabled={isHarvesting}
+                      value={baseUrlMoviesDooFree}
+                      onChange={(e) => {
+                        setBaseUrlMoviesDooFree(e.target.value);
+                      }}
+                      className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-2 text-[#58A6FF] text-xs font-mono focus:outline-none focus:border-[#58A6FF] bg-opacity-50 font-semibold cursor-pointer"
+                    >
+                      <option value="https://moviesdoofree.com/">🏠 หน้าหลัก (moviesdoofree.com)</option>
+                      <option value="https://moviesdoofree.com/ดู/category/หนังระทึกขวัญ/">😱 หนังระทึกขวัญ (moviesdoofree.com/ดู/category/หนังระทึกขวัญ/)</option>
+                      <option value="https://moviesdoofree.com/ดู/category/หนังสงคราม/">⚔️ หนังสงคราม (moviesdoofree.com/ดู/category/หนังสงคราม/)</option>
+                      <option value="https://moviesdoofree.com/ดู/category/หนังแอคชั่น/">💥 หนังแอคชั่น (moviesdoofree.com/ดู/category/หนังแอคชั่น/)</option>
+                      <option value="https://moviesdoofree.com/ดู/category/หนังเอเชีย/">🌏 หนังเอเชีย (moviesdoofree.com/ดู/category/หนังเอเชีย/)</option>
+                      <option value="https://moviesdoofree.com/ดู/category/หนังสยองขวัญ/">🧟 หนังสยองขวัญ (moviesdoofree.com/ดู/category/หนังสยองขวัญ/)</option>
+                    </select>
+                  </div>
+
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] text-gray-400 uppercase tracking-wider flex items-center justify-between">
-                      <span>BASE TARGET URL (เว็บไซต์หลัก)</span>
-                      <span className="text-amber-400 font-semibold">MOVIESDOOFREE.COM</span>
+                      <span>BASE TARGET URL (URL เว็บไซต์ / หมวดหมู่)</span>
                     </label>
                     <input
                       type="text"
@@ -5503,13 +5524,48 @@ if __name__ == "__main__":
 
                   {/* Quick Preset Buttons */}
                   <div className="flex flex-wrap gap-1.5 text-[10px]">
-                    <span className="text-gray-500 self-center">Presets:</span>
+                    <span className="text-gray-500 self-center">หมวดหมู่ด่วน:</span>
                     <button
                       type="button"
                       onClick={() => setBaseUrlMoviesDooFree("https://moviesdoofree.com/")}
-                      className="px-2 py-0.5 bg-[#161B22] hover:bg-[#21262d] border border-[#2D333B] rounded text-amber-400 cursor-pointer"
+                      className={`px-2 py-0.5 border rounded cursor-pointer transition-colors ${baseUrlMoviesDooFree === "https://moviesdoofree.com/" ? "bg-[#58A6FF]/20 border-[#58A6FF] text-[#58A6FF]" : "bg-[#161B22] hover:bg-[#21262d] border-[#2D333B] text-gray-300"}`}
                     >
-                      moviesdoofree.com (หน้าหลัก)
+                      หน้าหลัก
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBaseUrlMoviesDooFree("https://moviesdoofree.com/ดู/category/หนังระทึกขวัญ/")}
+                      className={`px-2 py-0.5 border rounded cursor-pointer transition-colors ${baseUrlMoviesDooFree.includes("หนังระทึกขวัญ") ? "bg-[#58A6FF]/20 border-[#58A6FF] text-[#58A6FF]" : "bg-[#161B22] hover:bg-[#21262d] border-[#2D333B] text-amber-400"}`}
+                    >
+                      😱 หนังระทึกขวัญ
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBaseUrlMoviesDooFree("https://moviesdoofree.com/ดู/category/หนังสงคราม/")}
+                      className={`px-2 py-0.5 border rounded cursor-pointer transition-colors ${baseUrlMoviesDooFree.includes("หนังสงคราม") ? "bg-[#58A6FF]/20 border-[#58A6FF] text-[#58A6FF]" : "bg-[#161B22] hover:bg-[#21262d] border-[#2D333B] text-amber-400"}`}
+                    >
+                      ⚔️ หนังสงคราม
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBaseUrlMoviesDooFree("https://moviesdoofree.com/ดู/category/หนังแอคชั่น/")}
+                      className={`px-2 py-0.5 border rounded cursor-pointer transition-colors ${baseUrlMoviesDooFree.includes("หนังแอคชั่น") ? "bg-[#58A6FF]/20 border-[#58A6FF] text-[#58A6FF]" : "bg-[#161B22] hover:bg-[#21262d] border-[#2D333B] text-amber-400"}`}
+                    >
+                      💥 หนังแอคชั่น
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBaseUrlMoviesDooFree("https://moviesdoofree.com/ดู/category/หนังเอเชีย/")}
+                      className={`px-2 py-0.5 border rounded cursor-pointer transition-colors ${baseUrlMoviesDooFree.includes("หนังเอเชีย") ? "bg-[#58A6FF]/20 border-[#58A6FF] text-[#58A6FF]" : "bg-[#161B22] hover:bg-[#21262d] border-[#2D333B] text-amber-400"}`}
+                    >
+                      🌏 หนังเอเชีย
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBaseUrlMoviesDooFree("https://moviesdoofree.com/ดู/category/หนังสยองขวัญ/")}
+                      className={`px-2 py-0.5 border rounded cursor-pointer transition-colors ${baseUrlMoviesDooFree.includes("หนังสยองขวัญ") ? "bg-[#58A6FF]/20 border-[#58A6FF] text-[#58A6FF]" : "bg-[#161B22] hover:bg-[#21262d] border-[#2D333B] text-amber-400"}`}
+                    >
+                      🧟 หนังสยองขวัญ
                     </button>
                   </div>
 
@@ -5542,7 +5598,7 @@ if __name__ == "__main__":
                   </div>
 
                   <span className="text-[10px] text-gray-500 bg-[#0d1117] p-3 rounded border border-[#2D333B] leading-relaxed">
-                    🎬 <strong>ระบบดึงข้อมูล MoviesDooFree Auto Scraper</strong> ดึงลิงก์หนัง, ปก, เรื่องย่อ และสตรีมมิ่งวิดีโอ <code>.m3u8</code> จากเครื่องเล่นไอเฟรมอัตโนมัติ (m3u8haha.com) รองรับการส่งออกไฟล์ W3U / M3U
+                    🎬 <strong>ระบบดึงข้อมูล MoviesDooFree Auto Scraper</strong> ดึงลิงก์หนัง, ปก, เรื่องย่อ และสตรีมมิ่งวิดีโอ <code>.m3u8</code> จากเครื่องเล่นไอเฟรมอัตโนมัติ (m3u8data.com) รองรับการส่งออกไฟล์ W3U / M3U
                   </span>
                 </div>
               )}
