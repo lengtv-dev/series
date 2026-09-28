@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         error: "Missing 'url' query parameter",
-        usage: "/proxy/?url=https://wow-drama.com/&referer=https://wow-drama.com/",
+        usage: "https://movse.cdn2-stream.workers.dev/proxy/?url=https://wow-drama.com/&referer=https://wow-drama.com/",
       },
       {
         status: 400,
