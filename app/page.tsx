@@ -41,6 +41,7 @@ interface Episode {
   groupTitle?: string;
   tvgId?: string;
   userAgent?: string;
+  referer?: string;
 }
 
 interface SeriesData {
@@ -282,7 +283,7 @@ const fetchWithTiming = async (url: string, options?: RequestInit) => {
 export default function SeriesHarvesterPage() {
   // Scraper controls
   // Active Harvester Tab Selection
-  const [activeTab, setActiveTab] = useState<"okserietv" | "kubhd24" | "123hdtv" | "doonang" | "ezmovie" | "wowdrama" | "seriedays" | "24hd" | "ddnung" | "moviesdoofree" | "w3u" | "proxy">("okserietv");
+  const [activeTab, setActiveTab] = useState<"okserietv" | "kubhd24" | "123hdtv" | "doonang" | "ezmovie" | "wowdrama" | "seriedays" | "24hd" | "seriesindy" | "moviesdoofree" | "w3u" | "proxy">("okserietv");
 
   // MoviesDooFree Scraper states & inputs
   const [baseUrlMoviesDooFree, setBaseUrlMoviesDooFree] = useState<string>("https://moviesdoofree.com/");
@@ -359,11 +360,11 @@ export default function SeriesHarvesterPage() {
   const [endPage24HD, setEndPage24HD] = useState<number>(3);
   const [seriesList24HD, setSeriesList24HD] = useState<SeriesData[]>([]);
 
-  // DDNUNG Scraper states & inputs
-  const [categoryUrlDDNung, setCategoryUrlDDNung] = useState<string>("https://ddnung.com/series-country/korean-series/");
-  const [startPageDDNung, setStartPageDDNung] = useState<number>(1);
-  const [endPageDDNung, setEndPageDDNung] = useState<number>(3);
-  const [seriesListDDNung, setSeriesListDDNung] = useState<SeriesData[]>([]);
+  // SeriesIndy Scraper states & inputs
+  const [categoryUrlSeriesIndy, setCategoryUrlSeriesIndy] = useState<string>("https://seriesindy.com/category/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b8%a2%e0%b9%8c%e0%b8%9d%e0%b8%a3%e0%b8%b1%e0%b9%88%e0%b8%87/");
+  const [startPageSeriesIndy, setStartPageSeriesIndy] = useState<number>(1);
+  const [endPageSeriesIndy, setEndPageSeriesIndy] = useState<number>(3);
+  const [seriesListSeriesIndy, setSeriesListSeriesIndy] = useState<SeriesData[]>([]);
 
 
   // DooNang Scraper states & inputs
@@ -378,8 +379,8 @@ export default function SeriesHarvesterPage() {
   const [seriesListDoonang, setSeriesListDoonang] = useState<SeriesData[]>([]);
 
   // EzMovie Scraper states & inputs
-  const [ezCategoryType, setEzCategoryType] = useState<string>("/movies/หนังมาใหม่");
-  const [ezCategory, setEzCategory] = useState<string>("/movies/หนังมาใหม่");
+  const [ezCategoryType, setEzCategoryType] = useState<string>("https://ezmovie.lol/movies/tag/%E0%B8%94%E0%B8%B9%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B8%AA%E0%B9%8C%E0%B8%AD%E0%B8%AD%E0%B8%99%E0%B9%84%E0%B8%A5%E0%B8%99%E0%B9%8C");
+  const [ezCategory, setEzCategory] = useState<string>("https://ezmovie.lol/movies/tag/%E0%B8%94%E0%B8%B9%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B8%AA%E0%B9%8C%E0%B8%AD%E0%B8%AD%E0%B8%99%E0%B9%84%E0%B8%A5%E0%B8%99%E0%B9%8C");
   const [ezStartPage, setEzStartPage] = useState<number>(1);
   const [ezEndPage, setEzEndPage] = useState<number>(2);
   const [seriesListEz, setSeriesListEz] = useState<SeriesData[]>([]);
@@ -444,7 +445,8 @@ export default function SeriesHarvesterPage() {
     else if (activeTab === "wowdrama") setSeriesListWow(updateList);
     else if (activeTab === "seriedays") setSeriesListSerieDays(updateList);
     else if (activeTab === "24hd") setSeriesList24HD(updateList);
-    else if (activeTab === "ddnung") setSeriesListDDNung(updateList);
+    else if (activeTab === "seriesindy") setSeriesListSeriesIndy(updateList);
+    else if (activeTab === "moviesdoofree") setSeriesListMoviesDooFree(updateList);
     else if (activeTab === "w3u") setSeriesListW3u(updateList);
   };
 
@@ -2255,9 +2257,11 @@ export default function SeriesHarvesterPage() {
 
   const parseEzMovieList = async (categoryPath: string, pageNum: number) => {
     let cleanPath = categoryPath.trim();
+    let baseOrigin = "https://ezmovie.lol";
     if (cleanPath.startsWith("http://") || cleanPath.startsWith("https://")) {
       try {
         const parsedNode = new URL(cleanPath);
+        baseOrigin = `${parsedNode.protocol}//${parsedNode.hostname}`;
         cleanPath = parsedNode.pathname;
         if (parsedNode.search) {
           const searchParams = new URLSearchParams(parsedNode.search);
@@ -2265,7 +2269,7 @@ export default function SeriesHarvesterPage() {
           const searchStr = searchParams.toString();
           cleanPath += searchStr ? `?${searchStr}` : "";
         }
-      } catch (e) {
+      } catch {
         // Fallback
       }
     }
@@ -2275,7 +2279,7 @@ export default function SeriesHarvesterPage() {
     }
 
     const separator = cleanPath.includes("?") ? "&" : "?";
-    const url = `https://ezmovie.movie${cleanPath}${separator}page=${pageNum}`;
+    const url = `${baseOrigin}${cleanPath}${separator}page=${pageNum}`;
     addLog(`⏳ กำลังสืบค้นรายการจากหน้า ${pageNum}: ${url}`, "info");
 
     const html = await fetchEzProxy(url);
@@ -2296,7 +2300,7 @@ export default function SeriesHarvesterPage() {
 
       const ajaxPath = el.getAttribute("data-url") || "";
       if (ajaxPath) {
-        const movieUrl = "https://ezmovie.movie" + ajaxPath.replace("/_ajax/movie/", "/movie/");
+        const movieUrl = `${baseOrigin}` + ajaxPath.replace("/_ajax/movie/", "/movie/");
         movies.push({ title, image, movieUrl });
       }
     });
@@ -2323,7 +2327,8 @@ export default function SeriesHarvesterPage() {
       uniqueUrls.add(mUri);
       episodes.push({
         title: `M3U8 Stream - เซิร์ฟเวอร์ ${episodes.length + 1}`,
-        url: mUri
+        url: mUri,
+        referer: "https://ezmovie.lol/"
       });
     });
 
@@ -2348,7 +2353,7 @@ export default function SeriesHarvesterPage() {
       if (src.startsWith("//")) {
         absoluteSrc = "https:" + src;
       } else if (src.startsWith("/")) {
-        absoluteSrc = "https://ezmovie.movie" + src;
+        absoluteSrc = "https://ezmovie.lol" + src;
       }
 
       addLog(`🕵️ วิเคราะห์แฝงตัวเล่นไฟล์: ${absoluteSrc.substring(0, 80)}...`, "info");
@@ -3168,10 +3173,11 @@ export default function SeriesHarvesterPage() {
     }
   };
 
-  const fetchDDNungProxy = async (targetUrl: string) => {
+  const fetchSeriesIndyProxy = async (targetUrl: string, referer?: string) => {
     try {
       const urlParam = encodeURIComponent(targetUrl);
-      const res = await fetch(`/api/ddnung?url=${urlParam}`);
+      const refParam = referer ? `&referer=${encodeURIComponent(referer)}` : "";
+      const res = await fetch(`/api/seriesindy?url=${urlParam}${refParam}`);
       if (!res.ok) return null;
       return await res.text();
     } catch {
@@ -3179,32 +3185,111 @@ export default function SeriesHarvesterPage() {
     }
   };
 
-  const startHarvestingDDNung = async () => {
+  const resolveSeriesIndyStream = async (watchUrl: string) => {
+    try {
+      const res = await fetch(`/api/seriesindy?action=resolve_stream&watchUrl=${encodeURIComponent(watchUrl)}`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (data.streamUrl) {
+        return {
+          streamUrl: data.streamUrl,
+          referer: data.referer || "https://series.team-indy.net/"
+        };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const getSeriesIndyFilenames = () => {
+    try {
+      const u = new URL(categoryUrlSeriesIndy);
+      const pathParts = u.pathname.replace(/\/$/, "").split("/").filter(Boolean);
+      const rawFname = pathParts.pop() || "series";
+      const fname = decodeURIComponent(rawFname);
+      const hostParts = u.hostname.replace(/^\.+|\.+$/g, "").split(".");
+      const wname = hostParts.length >= 2 ? hostParts[hostParts.length - 2] : "seriesindy";
+      return {
+        m3uName: `${wname}_${fname}_.m3u`,
+        w3uName: `${wname}_${fname}_.w3u`,
+        categoryName: fname
+      };
+    } catch {
+      return {
+        m3uName: "seriesindy_playlist_.m3u",
+        w3uName: "seriesindy_playlist_.w3u",
+        categoryName: "seriesindy"
+      };
+    }
+  };
+
+  const generateSeriesIndyM3U = (list: SeriesData[] = seriesListSeriesIndy): string => {
+    const lines: string[] = ["#EXTM3U", "#EXT-X-PLAYLIST-TYPE:VOD"];
+    list.forEach((item) => {
+      const poster = item.poster || "";
+      const group = cleanName(item.title);
+      item.episodes.forEach((ep: any) => {
+        const episode = cleanName(ep.title || "ตอน");
+        const url = fixUrl(ep.url);
+        if (!url) return;
+        lines.push(`#EXTINF:-1 tvg-logo="${poster}" group-title="${group}" ,${episode}`);
+        lines.push(`#EXTVLCOPT:http-referrer=https://series.team-indy.net/`);
+        lines.push(url);
+      });
+    });
+    return lines.join("\n");
+  };
+
+  const generateSeriesIndyW3U = (list: SeriesData[] = seriesListSeriesIndy): string => {
+    const timeday = new Date().toLocaleDateString("th-TH");
+    const { categoryName } = getSeriesIndyFilenames();
+    const w3uData = {
+      name: categoryName,
+      author: "SeriesIndy " + timeday,
+      info: "SeriesIndy Playlist",
+      image: "https://i0.wp.com/series-indy.com/wp-content/uploads/2023/01/series1111.png",
+      groups: list.map((item) => ({
+        name: item.title,
+        info: item.title,
+        image: item.poster || "",
+        stations: item.episodes.map((ep: any) => ({
+          name: ep.title,
+          image: ep.tvgLogo || item.poster || "",
+          url: ep.url,
+          referer: ep.referer || "https://series.team-indy.net/"
+        }))
+      }))
+    };
+    return JSON.stringify(w3uData, null, 2);
+  };
+
+  const startHarvestingSeriesIndy = async () => {
     if (isHarvesting) return;
     shouldStopRef.current = false;
     setIsHarvesting(true);
     setIsPaused(false);
 
     if (clearPrevious) {
-      setSeriesListDDNung([]);
+      setSeriesListSeriesIndy([]);
       setLogs([]);
     }
 
-    addLog(`🚀 เริ่มขุดข้อมูล DDNUNG (ddnung.com)... [หน้า ${startPageDDNung} - ${endPageDDNung}] [หมวดหมู่: ${categoryUrlDDNung}]`, "success");
+    addLog(`🚀 เริ่มขุดข้อมูล Series-Indy (seriesindy.com)... [หน้า ${startPageSeriesIndy} - ${endPageSeriesIndy}] [หมวดหมู่: ${categoryUrlSeriesIndy}]`, "success");
 
     let totalSaved = 0;
 
-    for (let page = startPageDDNung; page <= endPageDDNung; page++) {
+    for (let page = startPageSeriesIndy; page <= endPageSeriesIndy; page++) {
       if (shouldStopRef.current) break;
 
-      let pageUrl = categoryUrlDDNung;
+      let pageUrl = categoryUrlSeriesIndy;
       if (page > 1) {
-        pageUrl = categoryUrlDDNung.replace(/\/$/, "") + `/page/${page}/`;
+        pageUrl = categoryUrlSeriesIndy.replace(/\/$/, "") + `/page/${page}/`;
       }
 
-      addLog(`📂 [Page ${page}/${endPageDDNung}] กำลังโหลดหน้า: ${pageUrl}`, "info");
+      addLog(`📂 [Page ${page}/${endPageSeriesIndy}] กำลังโหลดหน้า: ${pageUrl}`, "info");
 
-      const html = await fetchDDNungProxy(pageUrl);
+      const html = await fetchSeriesIndyProxy(pageUrl);
       if (!html) {
         addLog(`⚠️ ไม่สามารถดึงข้อมูลหน้า ${page} ได้`, "warn");
         continue;
@@ -3213,197 +3298,142 @@ export default function SeriesHarvesterPage() {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
 
-      // Extract movie/series links from loop container or general anchors
-      const loopContainer = doc.querySelector(".elementor-loop-container");
-      const aTags = loopContainer ? Array.from(loopContainer.querySelectorAll("a[href]")) : Array.from(doc.querySelectorAll("a[href]"));
+      // Extract articles in latest container
+      const articles = Array.from(doc.querySelectorAll(".latest article, article.box, article"));
+      const seriesLinksMap = new Map<string, { url: string; title: string; titleEn: string; image: string }>();
 
-      const movieLinksMap = new Map<string, { url: string; title: string; image: string }>();
+      articles.forEach((art) => {
+        const aTag = art.querySelector("a[href]");
+        const href = aTag?.getAttribute("href") || "";
+        if (href && href.startsWith("http") && !href.includes("/category/") && !href.includes("/genre/") && !href.includes("#")) {
+          if (!seriesLinksMap.has(href)) {
+            const titleEl = art.querySelector(".addinfox h2, h2.entry-title, h2");
+            const title = titleEl?.textContent?.trim() || "";
+            const titleEnEl = art.querySelector(".addinfox");
+            const titleEn = titleEnEl?.textContent?.trim() || title;
 
-      aTags.forEach((a) => {
-        const href = a.getAttribute("href") || "";
-        if (href && !href.includes("/category/") && !href.includes("/series-country/") && !href.includes("#") && href.startsWith("http")) {
-          if (!movieLinksMap.has(href)) {
-            // Title
-            let title = "";
-            const titleDiv = a.querySelector("div[class*='d793f5f']") || a.querySelector(".elementor-heading-title");
-            if (titleDiv) {
-              title = titleDiv.textContent?.trim() || "";
-            }
-            if (!title) {
-              const slug = href.replace(/\/$/, "").split("/").pop() || "";
-              title = slug.replace(/-/g, " ");
-            }
-
-            // Image
             let imgUrl = "";
-            const bgDiv = a.querySelector("div[style*='background-image']");
-            if (bgDiv) {
-              const style = bgDiv.getAttribute("style") || "";
-              const match = style.match(/background-image:\s*url\(["']?([^"'\)]+)["']?\)/i);
-              if (match) imgUrl = match[1];
-            }
-            if (!imgUrl) {
-              const imgEl = a.querySelector("img");
-              if (imgEl) {
-                imgUrl = imgEl.getAttribute("src") || imgEl.getAttribute("data-src") || "";
+            const imgEl = art.querySelector("img");
+            if (imgEl) {
+              imgUrl = imgEl.getAttribute("data-src") || imgEl.getAttribute("data-lazy-src") || imgEl.getAttribute("src") || "";
+              if (imgUrl.startsWith("data:image")) {
+                imgUrl = imgEl.getAttribute("data-src") || imgEl.getAttribute("data-lazy-src") || "";
               }
+              if (imgUrl) imgUrl = imgUrl.split("?fit")[0];
             }
 
-            movieLinksMap.set(href, { url: href, title, image: imgUrl });
+            seriesLinksMap.set(href, {
+              url: href,
+              title: title || href.replace(/\/$/, "").split("/").pop() || "Series",
+              titleEn,
+              image: imgUrl
+            });
           }
         }
       });
 
-      const movieLinks = Array.from(movieLinksMap.values());
+      const seriesList = Array.from(seriesLinksMap.values());
 
-      if (movieLinks.length === 0) {
-        addLog(`--- ไม่พบรายการภาพยนตร์/ซีรีย์ ในหน้า ${page} ---`, "warn");
+      if (seriesList.length === 0) {
+        addLog(`--- ไม่พบรายการซีรีย์ในหน้า ${page} ---`, "warn");
         continue;
       }
 
-      addLog(`🔍 พบคลังหนัง/ซีรีย์ในหน้า ${page} ทั้งหมด ${movieLinks.length} เรื่อง`, "info");
+      addLog(`🔍 พบคลังซีรีย์ในหน้า ${page} ทั้งหมด ${seriesList.length} เรื่อง`, "info");
 
-      for (let mIndex = 0; mIndex < movieLinks.length; mIndex++) {
+      for (let sIndex = 0; sIndex < seriesList.length; sIndex++) {
         if (shouldStopRef.current) break;
 
-        const movie = movieLinks[mIndex];
+        const series = seriesList[sIndex];
 
         setCurrentProgress({
           page,
-          seriesIndex: mIndex + 1,
-          totalSeriesInPage: movieLinks.length,
-          currentSeriesName: movie.title
+          seriesIndex: sIndex + 1,
+          totalSeriesInPage: seriesList.length,
+          currentSeriesName: series.title
         });
 
-        addLog(`🎬 [${mIndex + 1}/${movieLinks.length}] ดึงข้อมูลเรื่อง: ${movie.title}`, "info");
+        addLog(`🎬 [${sIndex + 1}/${seriesList.length}] ดึงข้อมูลเรื่อง: ${series.title}`, "info");
 
-        const detailHtml = await fetchDDNungProxy(movie.url);
+        const detailHtml = await fetchSeriesIndyProxy(series.url);
         if (!detailHtml) {
-          addLog(`  ⚠️ ไม่สามารถโหลดรายละเอียด: ${movie.title}`, "warn");
+          addLog(`  ⚠️ ไม่สามารถโหลดรายละเอียด: ${series.title}`, "warn");
           continue;
         }
 
         const detailDoc = parser.parseFromString(detailHtml, "text/html");
 
-        // Title
-        const h1 = detailDoc.querySelector("h1.elementor-heading-title, h2.elementor-heading-title");
-        const movieTitle = h1 ? h1.textContent?.trim() || movie.title : movie.title;
-
-        // Cover image
-        const ogImage = detailDoc.querySelector("meta[property='og:image']");
-        let coverUrl = ogImage ? ogImage.getAttribute("content") || "" : "";
-        if (!coverUrl) {
-          const fullImg = detailDoc.querySelector("img.attachment-full, img[class*='wp-image']");
-          if (fullImg) {
-            coverUrl = fullImg.getAttribute("src") || fullImg.getAttribute("data-src") || "";
-          }
-        }
-        if (!coverUrl) coverUrl = movie.image;
-
-        // Audio info
-        let audioInfo = "พากย์ไทย/ซับไทย";
-        const headings = Array.from(detailDoc.querySelectorAll("h2.elementor-heading-title"));
-        for (const h2 of headings) {
-          const txt = h2.textContent?.trim() || "";
-          if (txt.includes("เสียง :") || txt.includes("เสียง:") || txt.includes("เสียง")) {
-            if (txt.includes(":")) audioInfo = txt.split(":")[1].trim();
-            else if (txt.includes("：")) audioInfo = txt.split("：")[1].trim();
-            else audioInfo = txt.replace("เสียง", "").trim();
-            break;
-          }
+        // Poster image
+        let coverUrl = series.image;
+        if (!coverUrl || coverUrl.startsWith("data:image")) {
+          const ogImage = detailDoc.querySelector("meta[property='og:image']");
+          if (ogImage) coverUrl = ogImage.getAttribute("content") || coverUrl;
         }
 
-        // Helper function to resolve embed link or m3u8 URL to direct m3u8 playlist
-        const resolveStreamUrlDDNung = (cand: string): string => {
-          if (!cand) return "";
-          let embedId = "";
-          if (cand.includes("playdd.seetvplay.xyz/embed/")) {
-            embedId = cand.split("/embed/")[1]?.split("?")[0]?.replace(/\/$/, "") || "";
-          } else if (cand.includes("hplay.hdplayfull.xyz/embed/")) {
-            embedId = cand.split("/embed/")[1]?.split("?")[0]?.replace(/\/$/, "") || "";
-          } else if (cand.includes("player77hdfree.xyz/embed/")) {
-            embedId = cand.split("/embed/")[1]?.split("?")[0]?.replace(/\/$/, "") || "";
-          } else if (cand.includes("playermhd.p2phls.xyz/embed/")) {
-            embedId = cand.split("/embed/")[1]?.split("?")[0]?.replace(/\/$/, "") || "";
-          } else if (cand.includes("vdohls.com/")) {
-            const match = cand.match(/vdohls\.com\/([a-zA-Z0-9_-]+)/);
-            if (match) embedId = match[1];
-          } else if (cand.includes("/embed/")) {
-            const match = cand.match(/\/embed\/([a-zA-Z0-9_-]+)/);
-            if (match) embedId = match[1];
-          }
+        // Find episode list (.epsdlist)
+        const epsdDiv = detailDoc.querySelector(".epsdlist");
+        const epLinks = epsdDiv ? Array.from(epsdDiv.querySelectorAll("li a, a[href*='/watch/']")) : Array.from(detailDoc.querySelectorAll("a[href*='/watch/']"));
 
-          if (embedId && embedId !== "about:blank") {
-            return `https://vdohls.com/${embedId}/playlist.m3u8`;
-          } else if (cand.includes(".m3u8")) {
-            return normalizeStreamUrl(cand);
-          }
-          return "";
-        };
+        if (epLinks.length === 0) {
+          addLog(`  ⚠️ ไม่พบรายการตอน (epsdlist) ของเรื่อง: ${series.title}`, "warn");
+          continue;
+        }
 
-        // Extract episodes
         const extractedEpisodes: Episode[] = [];
 
-        // 1. Try finding episode buttons (.swicth-ep, button[data-link], [data-link])
-        const epElements = Array.from(detailDoc.querySelectorAll(".swicth-ep, [data-link], button[data-link]"));
-        const seenUrls = new Set<string>();
+        for (let epIdx = 0; epIdx < epLinks.length; epIdx++) {
+          if (shouldStopRef.current) break;
 
-        epElements.forEach((el) => {
-          const rawLink = el.getAttribute("data-link") || el.getAttribute("data-link2") || "";
-          const resolvedUrl = resolveStreamUrlDDNung(rawLink);
-          if (resolvedUrl && !seenUrls.has(resolvedUrl)) {
-            seenUrls.add(resolvedUrl);
-            let epTitle = el.textContent?.trim() || "";
-            if (!epTitle || epTitle === "ตัวเล่นหลัก") {
-              epTitle = `${movieTitle} EP.${extractedEpisodes.length + 1}`;
-            }
+          const linkEl = epLinks[epIdx];
+          const watchHref = linkEl.getAttribute("href") || "";
+          if (!watchHref || !watchHref.startsWith("http")) continue;
+
+          // Skip known non-functional players as in Python script
+          if (watchHref.includes("ok.ru") || watchHref.includes("fembed")) continue;
+          if (watchHref.includes("yes-her-majesty-subth-ep-12") || watchHref.includes("yes-her-majesty-subth-ep-13") || watchHref.includes("the-red-sleeve-subth-ep-8-v3")) continue;
+
+          const enameRaw = linkEl.querySelector(".epl-num")?.textContent?.trim() || linkEl.textContent?.trim() || `EP.${epIdx + 1}`;
+          let ename_s = enameRaw.split("-").pop()?.trim() || enameRaw;
+          ename_s = ename_s.replace(/EP/gi, "ตอนที่").replace(/\s+ตอนที่/g, "ตอนที่").trim();
+
+          // Resolve stream URL using server-side resolver
+          const resolved = await resolveSeriesIndyStream(watchHref);
+          if (resolved?.streamUrl) {
             extractedEpisodes.push({
-              title: epTitle,
-              url: resolvedUrl
+              title: ename_s,
+              url: resolved.streamUrl,
+              referer: resolved.referer || "https://series.team-indy.net/",
+              groupTitle: series.titleEn || series.title,
+              tvgLogo: coverUrl
             });
+            addLog(`    [${epIdx + 1}/${epLinks.length}] ${ename_s} → ${resolved.streamUrl.substring(0, 45)}...`, "info");
+          } else {
+            addLog(`    [${epIdx + 1}/${epLinks.length}] ${ename_s} - ค้นหา link ตอนนี้ ไม่เจอ`, "warn");
           }
-        });
 
-        // 2. If no multi-episode buttons found, fallback to single movie iframe / links
-        if (extractedEpisodes.length === 0) {
-          const iframeList = Array.from(detailDoc.querySelectorAll("iframe"));
-          const linkList = Array.from(detailDoc.querySelectorAll("a[href]"));
-
-          const candidates: string[] = [
-            ...iframeList.map(i => i.getAttribute("src") || i.getAttribute("data-src") || ""),
-            ...linkList.map(l => l.getAttribute("href") || "")
-          ].filter(Boolean);
-
-          for (const cand of candidates) {
-            const stUrl = resolveStreamUrlDDNung(cand);
-            if (stUrl) {
-              extractedEpisodes.push({
-                title: `${movieTitle} [${audioInfo}]`,
-                url: stUrl
-              });
-              break;
-            }
+          if (epIdx < epLinks.length - 1) {
+            await waitState(100);
           }
         }
 
         if (extractedEpisodes.length > 0) {
           totalSaved++;
           const newSeries: SeriesData = {
-            id: movie.url,
-            title: movieTitle,
+            id: series.url,
+            title: series.title,
             poster: coverUrl,
-            synopsis: `เสียง: ${audioInfo} | จำนวน: ${extractedEpisodes.length} ตอน | แหล่งข้อมูล: ddnung.com`,
+            synopsis: `จำนวน: ${extractedEpisodes.length} ตอน | แหล่งข้อมูล: seriesindy.com`,
             pageNum: page,
             episodes: extractedEpisodes
           };
 
-          setSeriesListDDNung((prev) => [newSeries, ...prev.filter(it => it.id !== newSeries.id)]);
-          addLog(`   ✅ [${extractedEpisodes.length} EP] ${movieTitle} → ${extractedEpisodes[0].url.substring(0, 50)}...`, "success");
+          setSeriesListSeriesIndy((prev) => [newSeries, ...prev.filter(it => it.id !== newSeries.id)]);
+          addLog(`   ✅ [${extractedEpisodes.length} ตอน] ${series.title} สำเร็จ`, "success");
         } else {
-          addLog(`   ⚠️ ไม่พบลิงก์วิดีโอ (embed/m3u8) สำหรับ: ${movieTitle}`, "warn");
+          addLog(`   ⚠️ ไม่พบคลิปวิดีโอที่สามารถเล่นได้สำหรับ: ${series.title}`, "warn");
         }
 
-        if (mIndex < movieLinks.length - 1) {
+        if (sIndex < seriesList.length - 1) {
           await waitState(delayMs);
         }
       }
@@ -3411,9 +3441,9 @@ export default function SeriesHarvesterPage() {
 
     setIsHarvesting(false);
     if (shouldStopRef.current) {
-      addLog(`🛑 ยกเลิกภารกิจขุด DDNUNG กลางทางเรียบร้อยแล้ว`, "warn");
+      addLog(`🛑 ยกเลิกภารกิจขุด Series-Indy กลางทางเรียบร้อยแล้ว`, "warn");
     } else {
-      addLog(`🎉 สารบัญ DDNUNG เสร็จสิ้นเรียบร้อย! ค้นพบและบันทึกเพลย์ลิสต์ [ ${totalSaved} ] เรื่อง`, "success");
+      addLog(`🎉 สารบัญ Series-Indy เสร็จสิ้นเรียบร้อย! ค้นพบและบันทึกเพลย์ลิสต์ [ ${totalSaved} ] เรื่อง`, "success");
     }
   };
 
@@ -3661,8 +3691,8 @@ export default function SeriesHarvesterPage() {
       startHarvestingSerieDays();
     } else if (activeTab === "24hd") {
       startHarvesting24HD();
-    } else if (activeTab === "ddnung") {
-      startHarvestingDDNung();
+    } else if (activeTab === "seriesindy") {
+      startHarvestingSeriesIndy();
     } else if (activeTab === "moviesdoofree") {
       startHarvestingMoviesDooFree();
     } else if (activeTab === "w3u") {
@@ -3705,11 +3735,11 @@ export default function SeriesHarvesterPage() {
     if (activeTab === "wowdrama") return seriesListWow;
     if (activeTab === "seriedays") return seriesListSerieDays;
     if (activeTab === "24hd") return seriesList24HD;
-    if (activeTab === "ddnung") return seriesListDDNung;
+    if (activeTab === "seriesindy") return seriesListSeriesIndy;
     if (activeTab === "moviesdoofree") return seriesListMoviesDooFree;
     if (activeTab === "w3u") return seriesListW3u;
     return seriesListDoonang;
-  }, [activeTab, seriesList, seriesList123, seriesListDoonang, seriesListEz, seriesListWow, seriesListSerieDays, seriesList24HD, seriesListDDNung, seriesListMoviesDooFree, seriesListW3u]);
+  }, [activeTab, seriesList, seriesList123, seriesListDoonang, seriesListEz, seriesListWow, seriesListSerieDays, seriesList24HD, seriesListSeriesIndy, seriesListMoviesDooFree, seriesListW3u]);
 
   const fixUrl = (url: string) => {
     return normalizeStreamUrl(url);
@@ -3742,6 +3772,10 @@ export default function SeriesHarvesterPage() {
 
       const extinf = `#EXTINF:-1 tvg-id="${tvgId}" tvg-logo="${logo}" group-title="${group}",${title} - ${episode}`;
       playlist.push(extinf);
+      const referer = ep.referer || (activeTab === "seriesindy" ? "https://series.team-indy.net/" : "");
+      if (referer) {
+        playlist.push(`#EXTVLCOPT:http-referrer=${referer}`);
+      }
       playlist.push(url);
 
       if (w3uExtraFlags && ep.userAgent) {
@@ -3809,6 +3843,10 @@ export default function SeriesHarvesterPage() {
 
         const extinf = `#EXTINF:-1 tvg-id="${tvgId}" tvg-logo="${logo}" group-title="${group}",${title} - ${episode}`;
         playlist.push(extinf);
+        const referer = ep.referer || (activeTab === "seriesindy" ? "https://series.team-indy.net/" : "");
+        if (referer) {
+          playlist.push(`#EXTVLCOPT:http-referrer=${referer}`);
+        }
         playlist.push(url);
 
         if (w3uExtraFlags && ep.userAgent) {
@@ -3863,7 +3901,7 @@ export default function SeriesHarvesterPage() {
     else if (activeTab === "wowdrama") setSeriesListWow(filterFn);
     else if (activeTab === "seriedays") setSeriesListSerieDays(filterFn);
     else if (activeTab === "24hd") setSeriesList24HD(filterFn);
-    else if (activeTab === "ddnung") setSeriesListDDNung(filterFn);
+    else if (activeTab === "seriesindy") setSeriesListSeriesIndy(filterFn);
     else if (activeTab === "moviesdoofree") setSeriesListMoviesDooFree(filterFn);
     else if (activeTab === "w3u") setSeriesListW3u(filterFn);
 
@@ -3950,7 +3988,7 @@ export default function SeriesHarvesterPage() {
           <div className="text-left sm:text-right font-mono">
             <div className="text-[10px] text-gray-500 uppercase">Active Engine</div>
             <div className="text-xs text-white uppercase mt-0.5 truncate max-w-[200px]">
-              {activeTab === "okserietv" || activeTab === "kubhd24" ? "OKSERIETV SCRAPER" : activeTab === "123hdtv" ? "123HDTV AJAX" : activeTab === "ezmovie" ? "EZMOVIE SCRAPER" : activeTab === "wowdrama" ? "WOW-DRAMA SCRAPER" : activeTab === "seriedays" ? "SERIEDAYS SCRAPER" : activeTab === "24hd" ? "24HD MOVIES SCRAPER" : activeTab === "ddnung" ? "DDNUNG SCRAPER" : activeTab === "moviesdoofree" ? "MOVIESDOOFREE SCRAPER" : activeTab === "w3u" ? "W3U CONVERTER" : activeTab === "proxy" ? "REFERER PROXY SYSTEM" : "DOO-NANG GRAPHQL"}
+              {activeTab === "okserietv" || activeTab === "kubhd24" ? "OKSERIETV SCRAPER" : activeTab === "123hdtv" ? "123HDTV AJAX" : activeTab === "ezmovie" ? "EZMOVIE SCRAPER" : activeTab === "wowdrama" ? "WOW-DRAMA SCRAPER" : activeTab === "seriedays" ? "SERIEDAYS SCRAPER" : activeTab === "24hd" ? "24HD MOVIES SCRAPER" : activeTab === "seriesindy" ? "SERIES-INDY SCRAPER" : activeTab === "moviesdoofree" ? "MOVIESDOOFREE SCRAPER" : activeTab === "w3u" ? "W3U CONVERTER" : activeTab === "proxy" ? "REFERER PROXY SYSTEM" : "DOO-NANG GRAPHQL"}
             </div>
           </div>
 
@@ -4099,19 +4137,19 @@ export default function SeriesHarvesterPage() {
         <button
           onClick={() => {
             if (!isHarvesting) {
-              handleSwitchTab("ddnung");
+              handleSwitchTab("seriesindy");
             }
           }}
           disabled={isHarvesting}
           className={cn(
             "flex-1 py-2.5 px-3 rounded text-xs font-bold font-mono tracking-wider uppercase transition-all flex items-center justify-center gap-2 select-none cursor-pointer disabled:opacity-50 whitespace-nowrap",
-            activeTab === "ddnung" 
+            activeTab === "seriesindy" 
               ? "bg-[#58A6FF] text-[#0A0C10]" 
               : "text-gray-400 hover:text-white hover:bg-[#161B22]"
           )}
         >
           <Film size={14} />
-          <span>DDNUNG (ดีดีหนัง)</span>
+          <span>SERIES-INDY (ซีรีย์อินดี้)</span>
         </button>
 
         <button
@@ -4945,28 +4983,31 @@ export default function SeriesHarvesterPage() {
                         }}
                         className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-1.5 text-[#58A6FF] text-xs font-mono focus:outline-none focus:border-[#58A6FF] bg-opacity-50 font-semibold"
                       >
-                        <option value="/movies/หนังมาใหม่">🎬 หนังมาใหม่ทั้งหมด (New Movies)</option>
-                        <option value="/movies/หนังไทย">🇹🇭 หนังไทย (Thai Movies)</option>
-                        <option value="/movies/หนังฝรั่ง">🇺🇸 หนังฝรั่ง (Western Movies)</option>
-                        <option value="/movies/หนังเอเชีย">🇨🇳 หนังเอเชีย (Asian Movies)</option>
-                        <option value="/movies/หนังแอคชั่นบู๊-action">💥 หนังบู๊แอคชั่น (Action)</option>
-                        <option value="/movies/หนังดราม่า-drama">😭 หนังดราม่าชีวิต (Drama)</option>
-                        <option value="/movies/หนังผจญภัย-adventure">🗺️ หนังผจญภัย (Adventure)</option>
-                        <option value="/movies/หนังเกาหลี">🇰🇷 หนังเกาหลี (Korean Movies)</option>
-                        <option value="/movies/หนังญี่ปุ่น">🇯🇵 หนังญี่ปุ่น (Japanese Movies)</option>
+                        <option value="https://ezmovie.lol/movies/tag/%E0%B8%94%E0%B8%B9%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B8%AA%E0%B9%8C%E0%B8%AD%E0%B8%AD%E0%B8%99%E0%B9%84%E0%B8%A5%E0%B8%99%E0%B9%8C">📺 แท็ก ดูซีรีส์ออนไลน์ (ezmovie.lol/movies/tag/ดูซีรีส์ออนไลน์)</option>
+                        <option value="https://ezmovie.lol/movies/%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B9%8C">🍿 หมวดหมู่ ซีรีย์ (ezmovie.lol/movies/ซีรีย์)</option>
+                        <option value="https://ezmovie.lol/movies/หนังมาใหม่">🎬 หนังมาใหม่ทั้งหมด (ezmovie.lol/movies/หนังมาใหม่)</option>
+                        <option value="https://ezmovie.lol/movies/หนังไทย">🇹🇭 หนังไทย (ezmovie.lol/movies/หนังไทย)</option>
+                        <option value="https://ezmovie.lol/movies/หนังฝรั่ง">🇺🇸 หนังฝรั่ง (ezmovie.lol/movies/หนังฝรั่ง)</option>
+                        <option value="https://ezmovie.lol/movies/หนังเอเชีย">🇨🇳 หนังเอเชีย (ezmovie.lol/movies/หนังเอเชีย)</option>
+                        <option value="https://ezmovie.lol/movies/หนังแอคชั่นบู๊-action">💥 หนังบู๊แอคชั่น (Action)</option>
+                        <option value="https://ezmovie.lol/movies/หนังดราม่า-drama">😭 หนังดราม่าชีวิต (Drama)</option>
+                        <option value="https://ezmovie.lol/movies/หนังผจญภัย-adventure">🗺️ หนังผจญภัย (Adventure)</option>
+                        <option value="https://ezmovie.lol/movies/หนังเกาหลี">🇰🇷 หนังเกาหลี (Korean Movies)</option>
+                        <option value="https://ezmovie.lol/movies/หนังญี่ปุ่น">🇯🇵 หนังญี่ปุ่น (Japanese Movies)</option>
                         <option value="custom">✏️ กำหนดคีย์ / URL หมวดหมู่อื่นๆ (Custom URL / Path)</option>
                       </select>
 
-                      {ezCategoryType === "custom" && (
-                        <input
-                          type="text"
-                          disabled={isHarvesting}
-                          value={ezCategory}
-                          onChange={(e) => setEzCategory(e.target.value)}
-                          placeholder="เช่น https://ezmovie.movie/movies/... หรือ /movies/..."
-                          className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-1.5 text-white text-xs focus:outline-none focus:border-[#58A6FF] font-mono"
-                        />
-                      )}
+                      <input
+                        type="text"
+                        disabled={isHarvesting}
+                        value={ezCategory}
+                        onChange={(e) => {
+                          setEzCategory(e.target.value);
+                          setEzCategoryType("custom");
+                        }}
+                        placeholder="เช่น https://ezmovie.lol/movies/... หรือ /movies/..."
+                        className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-1.5 text-white text-xs focus:outline-none focus:border-[#58A6FF] font-mono"
+                      />
                     </div>
                   </div>
 
@@ -4997,7 +5038,7 @@ export default function SeriesHarvesterPage() {
                   </div>
 
                   <span className="text-[10px] text-[#58A6FF]/90 bg-[#58A6FF]/5 p-3 rounded border border-[#58A6FF]/10 font-mono leading-relaxed">
-                    🌟 ดึงข้อมูลจากคลังภาพยนตร์ ezmovie.movie โดยอัตโนมัติ ด้วยระบบระบุ iframe แปลงไฟล์ M3U8 เพลย์ลิสต์ตรงระดับพรีเมี่ยม
+                    🌟 ดึงข้อมูลจากคลังภาพยนตร์และซีรีย์ ezmovie.lol โดยอัตโนมัติ ด้วยระบบระบุ iframe แปลงไฟล์ M3U8 เพลย์ลิสต์ตรงระดับพรีเมี่ยม
                   </span>
                 </div>
               )}
@@ -5207,35 +5248,40 @@ export default function SeriesHarvesterPage() {
                 </div>
               )}
 
-              {/* DDNUNG Configuration Forms */}
-              {activeTab === "ddnung" && (
+              {/* SeriesIndy Configuration Forms */}
+              {activeTab === "seriesindy" && (
                 <div className="flex flex-col gap-3 pt-1">
                   <div className="flex flex-col gap-1.5 pb-2 border-b border-[#2D333B]/60">
-                    <label className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Target Category (DDNung)</label>
+                    <label className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Target Category (Series-Indy)</label>
                     <div className="flex flex-col gap-2">
                       <select
                         disabled={isHarvesting}
-                        value={categoryUrlDDNung}
+                        value={categoryUrlSeriesIndy}
                         onChange={(e) => {
-                          setCategoryUrlDDNung(e.target.value);
+                          setCategoryUrlSeriesIndy(e.target.value);
                         }}
                         className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-1.5 text-[#58A6FF] text-xs font-mono focus:outline-none focus:border-[#58A6FF] bg-opacity-50 font-semibold"
                       >
-                        <option value="https://ddnung.com/series-country/korean-series/">🇰🇷 ซีรีย์เกาหลี (ddnung.com/series-country/korean-series/)</option>
-                        <option value="https://ddnung.com/series-country/thai-series/">🇹🇭 ซีรีย์ไทย (ddnung.com/series-country/thai-series/)</option>
-                        <option value="https://ddnung.com/year/2026/">🍿 หนัง/ซีรีย์ปี 2026 (ddnung.com/year/2026/)</option>
-                        <option value="https://ddnung.com/series/">📺 ซีรีย์ทั้งหมด (ddnung.com/series/)</option>
-                        <option value="https://ddnung.com/movie/">🎬 หนังทั้งหมด (ddnung.com/movie/)</option>
-                        <option value="https://ddnung.com/country/inter/">🌐 หนัง/ซีรีย์ฝรั่ง Inter (ddnung.com/country/inter/)</option>
-                        <option value="https://ddnung.com/series-country/chinese-series/">🇨🇳 ซีรีย์จีน (ddnung.com/series-country/chinese-series/)</option>
-                        <option value="https://ddnung.com/series-country/anime-series/">⛩️ ซีรีย์อนิเมะ (ddnung.com/series-country/anime-series/)</option>
+                        <option value="https://seriesindy.com/category/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b8%a2%e0%b9%8c%e0%b8%9d%e0%b8%a3%e0%b8%b1%e0%b9%88%e0%b8%87/">🌐 ซีรีย์ฝรั่ง (seriesindy.com/category/ซีรีย์ฝรั่ง/)</option>
+                        <option value="https://seriesindy.com/category/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b8%a2%e0%b9%8c%e0%b8%8d%e0%b8%b5%e0%b9%88%e0%b8%9b%e0%b8%b8%e0%b9%88%e0%b8%99/">🇯🇵 ซีรีย์ญี่ปุ่น (seriesindy.com/category/ซีรีย์ญี่ปุ่น/)</option>
+                        <option value="https://seriesindy.com/category/subthai/">💬 ซีรีย์ซับไทย (seriesindy.com/category/subthai/)</option>
+                        <option value="https://seriesindy.com/category/th-dub/">🗣️ ซีรีย์พากย์ไทย (seriesindy.com/category/th-dub/)</option>
+                        <option value="https://seriesindy.com/genre/drama/">🎭 แนว Drama (seriesindy.com/genre/drama/)</option>
+                        <option value="https://seriesindy.com/category/krserie/">🇰🇷 ซีรีย์เกาหลี (seriesindy.com/category/krserie/)</option>
+                        <option value="https://seriesindy.com/category/chinese/">🇨🇳 ซีรีย์จีน (seriesindy.com/category/chinese/)</option>
+                        <option value="https://seriesindy.com/category/%e0%b8%8b%e0%b8%b5%e0%b8%a3%e0%b8%b5%e0%b8%a2%e0%b9%8c%e0%b8%a7%e0%b8%b2%e0%b8%a2/">🌈 ซีรีย์วาย (seriesindy.com/category/ซีรีย์วาย/)</option>
+                        <option value="https://seriesindy.com/category/%e0%b8%81%e0%b8%b2%e0%b8%a3%e0%b9%8c%e0%b8%95%e0%b8%b9%e0%b8%99/">⛩️ การ์ตูน/อนิเมะ (seriesindy.com/category/การ์ตูน/)</option>
+                        <option value="https://seriesindy.com/genre/action-adventure/">💥 แอคชั่น & ผจญภัย (seriesindy.com/genre/action-adventure/)</option>
+                        <option value="https://seriesindy.com/genre/comedy/">🤣 ตลก Comedy (seriesindy.com/genre/comedy/)</option>
+                        <option value="https://seriesindy.com/genre/romance/">💖 โรแมนติก Romance (seriesindy.com/genre/romance/)</option>
+                        <option value="https://seriesindy.com/genre/%e0%b8%aa%e0%b8%a2%e0%b8%ad%e0%b8%87-%e0%b8%82%e0%b8%a7%e0%b8%b1%e0%b8%8d/">👻 สยองขวัญ Horror (seriesindy.com/genre/สยองขวัญ/)</option>
                       </select>
                       <input
                         type="text"
                         disabled={isHarvesting}
-                        value={categoryUrlDDNung}
-                        onChange={(e) => setCategoryUrlDDNung(e.target.value)}
-                        placeholder="หรือระบุ URL หมวดหมู่ตรงๆ e.g. https://ddnung.com/..."
+                        value={categoryUrlSeriesIndy}
+                        onChange={(e) => setCategoryUrlSeriesIndy(e.target.value)}
+                        placeholder="หรือระบุ URL หมวดหมู่ตรงๆ e.g. https://seriesindy.com/..."
                         className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-1.5 text-white text-xs font-mono focus:outline-none focus:border-[#58A6FF]"
                       />
                     </div>
@@ -5248,8 +5294,8 @@ export default function SeriesHarvesterPage() {
                         type="number"
                         min="1"
                         disabled={isHarvesting}
-                        value={startPageDDNung}
-                        onChange={(e) => setStartPageDDNung(Math.max(1, parseInt(e.target.value) || 1))}
+                        value={startPageSeriesIndy}
+                        onChange={(e) => setStartPageSeriesIndy(Math.max(1, parseInt(e.target.value) || 1))}
                         className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-1.5 text-white text-xs font-mono focus:outline-none focus:border-[#58A6FF]"
                       />
                     </div>
@@ -5259,15 +5305,87 @@ export default function SeriesHarvesterPage() {
                         type="number"
                         min="1"
                         disabled={isHarvesting}
-                        value={endPageDDNung}
-                        onChange={(e) => setEndPageDDNung(Math.max(1, parseInt(e.target.value) || 1))}
+                        value={endPageSeriesIndy}
+                        onChange={(e) => setEndPageSeriesIndy(Math.max(1, parseInt(e.target.value) || 1))}
                         className="w-full bg-[#161B22] border border-[#2D333B] rounded px-3 py-1.5 text-white text-xs font-mono focus:outline-none focus:border-[#58A6FF]"
                       />
                     </div>
                   </div>
 
+                  {seriesListSeriesIndy.length > 0 && (
+                    <div className="flex flex-col gap-2 p-2.5 bg-[#161B22]/80 border border-[#58A6FF]/30 rounded font-mono">
+                      <span className="text-[10px] text-[#58A6FF] font-bold uppercase tracking-wider flex items-center justify-between">
+                        <span className="flex items-center gap-1">📦 ไฟล์ผลลัพธ์ Series-Indy ({seriesListSeriesIndy.length} เรื่อง)</span>
+                        <span className="text-[9px] text-gray-400">{getSeriesIndyFilenames().m3uName}</span>
+                      </span>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const { m3uName } = getSeriesIndyFilenames();
+                            const content = generateSeriesIndyM3U();
+                            downloadM3U(content, m3uName);
+                            addLog(`💾 ดาวน์โหลดไฟล์ ${m3uName} เรียบร้อยแล้ว`, "success");
+                          }}
+                          className="py-1.5 px-2 bg-[#3FB950]/15 hover:bg-[#3FB950]/25 text-[#3FB950] border border-[#3FB950]/40 rounded text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Download size={12} />
+                          <span>โหลด .M3U</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const { w3uName } = getSeriesIndyFilenames();
+                            const content = generateSeriesIndyW3U();
+                            const blob = new Blob([content], { type: "application/json" });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = w3uName;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            addLog(`💾 ดาวน์โหลดไฟล์ ${w3uName} เรียบร้อยแล้ว`, "success");
+                          }}
+                          className="py-1.5 px-2 bg-[#58A6FF]/15 hover:bg-[#58A6FF]/25 text-[#58A6FF] border border-[#58A6FF]/40 rounded text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Download size={12} />
+                          <span>โหลด .W3U</span>
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const content = generateSeriesIndyM3U();
+                            copyToClipboard(content, "seriesindy-m3u-all");
+                            addLog(`📋 คัดลอก M3U ของ Series-Indy แล้ว!`, "success");
+                          }}
+                          className="py-1 px-2 bg-[#21262D] hover:bg-[#30363D] text-gray-200 border border-[#30363D] rounded text-[9px] flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Copy size={10} />
+                          <span>คัดลอก M3U</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const content = generateSeriesIndyW3U();
+                            copyToClipboard(content, "seriesindy-w3u-all");
+                            addLog(`📋 คัดลอก W3U (JSON) ของ Series-Indy แล้ว!`, "success");
+                          }}
+                          className="py-1 px-2 bg-[#21262D] hover:bg-[#30363D] text-gray-200 border border-[#30363D] rounded text-[9px] flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Copy size={10} />
+                          <span>คัดลอก W3U</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <span className="text-[10px] text-gray-500 bg-[#0d1117] p-3 rounded border border-[#2D333B] font-mono leading-relaxed">
-                    🚀 ดึงข้อมูลภาพยนตร์/ซีรีย์จาก ddnung.com ถอดรหัส embed player (seetvplay, hdplayfull, player77hdfree, playermhd, vdohls) เป็น m3u8 สตรีมมิ่งสดอัตโนมัติ
+                    🚀 ดึงข้อมูลซีรีย์/ภาพยนตร์จาก seriesindy.com ถอดรหัส embed player (series.team-indy.net, anime-kame, runplayer m3u8) พร้อมข้อมูลปกและตอน ส่งออก M3U และ W3U
                   </span>
                 </div>
               )}
@@ -5656,12 +5774,12 @@ if __name__ == "__main__":
                     <button
                       type="button"
                       onClick={() => {
-                        setProxyTargetUrl("https://ddnung.com/");
-                        setProxyReferer("https://ddnung.com/");
+                        setProxyTargetUrl("https://seriesindy.com/");
+                        setProxyReferer("https://seriesindy.com/");
                       }}
-                      className="px-2 py-0.5 bg-[#161B22] hover:bg-[#21262d] border border-[#2D333B] rounded text-purple-400 cursor-pointer"
+                      className="px-2 py-0.5 bg-[#161B22] hover:bg-[#21262d] border border-[#2D333B] rounded text-emerald-400 cursor-pointer"
                     >
-                      ddnung.com
+                      seriesindy.com
                     </button>
                   </div>
 

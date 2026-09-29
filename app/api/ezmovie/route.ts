@@ -18,10 +18,11 @@ export async function GET(request: NextRequest) {
     const hostname = targetUrl.hostname;
 
     // Allowed domains for EzMovie proxying to maintain robust scraping.
-    // Allow ezmovie.movie domains plus typical player / CDN embeds or general domain patterns.
+    // Allow ezmovie domains (including ezmovie.lol, ezmovie.movie) plus typical player / CDN embeds or general domain patterns.
     const isAllowed = 
-      hostname === "ezmovie.movie" ||
-      hostname.endsWith(".ezmovie.movie") ||
+      hostname.includes("ezmovie") ||
+      hostname.endsWith(".lol") ||
+      hostname.endsWith(".movie") ||
       hostname.endsWith(".com") ||
       hostname.endsWith(".net") ||
       hostname.endsWith(".org") ||
@@ -44,7 +45,8 @@ export async function GET(request: NextRequest) {
       "User-Agent",
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     );
-    headers.set("Referer", "https://ezmovie.movie/");
+    const customReferer = searchParams.get("referer");
+    headers.set("Referer", customReferer || (hostname.includes("ezmovie") ? `${targetUrl.protocol}//${targetUrl.hostname}/` : "https://ezmovie.lol/"));
     headers.set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
 
     const response = await fetch(targetUrlStr, {
