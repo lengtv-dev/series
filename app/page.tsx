@@ -1251,7 +1251,7 @@ export default function SeriesHarvesterPage() {
       // Initialize Python data structures
       const jseries: any = {
         name: "",
-        author: "By playid " + timeday,
+        author: "By PLAYIDTV " + timeday,
         info: "",
         image: "https://www.123-hdd.com/wp-content/uploads/2019/10/testa7.png",
         groups: [],
@@ -1259,7 +1259,7 @@ export default function SeriesHarvesterPage() {
 
       const jmovie: any = {
         name: "",
-        author: "By playid " + timeday,
+        author: "By PLAYIDTV " + timeday,
         info: "",
         image: "https://www.123-hdd.com/wp-content/uploads/2019/10/testa7.png",
         stations: [],
@@ -3967,7 +3967,7 @@ export default function SeriesHarvesterPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-sm font-bold tracking-wider uppercase text-gray-100 font-mono" style={{ borderColor: "#4b6d55" }}>K-Harvest Pro</h1>
-              <span className="text-[10px] bg-[#1f242c] border border-[#2D333B] px-1.5 py-0.5 rounded text-[#58A6FF] font-mono">BY PLAID</span>
+              <span className="text-[10px] bg-[#1f242c] border border-[#2D333B] px-1.5 py-0.5 rounded text-[#58A6FF] font-mono">BY PLAYIDTV</span>
             </div>
             <p className="text-[10px] text-[#58A6FF] uppercase tracking-wider font-mono">Multi-Page API Harvester v4.2</p>
           </div>
@@ -3988,7 +3988,7 @@ export default function SeriesHarvesterPage() {
           <div className="text-left sm:text-right font-mono">
             <div className="text-[10px] text-gray-500 uppercase">Active Engine</div>
             <div className="text-xs text-white uppercase mt-0.5 truncate max-w-[200px]">
-              {activeTab === "okserietv" || activeTab === "kubhd24" ? "OKSERIETV SCRAPER" : activeTab === "123hdtv" ? "123HDTV AJAX" : activeTab === "ezmovie" ? "EZMOVIE SCRAPER" : activeTab === "wowdrama" ? "WOW-DRAMA SCRAPER" : activeTab === "seriedays" ? "SERIEDAYS SCRAPER" : activeTab === "24hd" ? "24HD MOVIES SCRAPER" : activeTab === "seriesindy" ? "SERIES-INDY SCRAPER" : activeTab === "moviesdoofree" ? "MOVIESDOOFREE SCRAPER" : activeTab === "w3u" ? "W3U CONVERTER" : activeTab === "proxy" ? "REFERER PROXY SYSTEM" : "DOO-NANG GRAPHQL"}
+              {activeTab === "okserietv" || activeTab === "kubhd24" ? "OKSERIETV SCRAPER" : activeTab === "123hdtv" ? "PLAYIDTV SCRIPT" : activeTab === "ezmovie" ? "EZMOVIE SCRAPER" : activeTab === "wowdrama" ? "WOW-DRAMA SCRAPER" : activeTab === "seriedays" ? "SERIEDAYS SCRAPER" : activeTab === "24hd" ? "24HD MOVIES SCRAPER" : activeTab === "seriesindy" ? "SERIES-INDY SCRAPER" : activeTab === "moviesdoofree" ? "MOVIESDOOFREE SCRAPER" : activeTab === "w3u" ? "W3U CONVERTER" : activeTab === "proxy" ? "REFERER PROXY SYSTEM" : "DOO-NANG GRAPHQL"}
             </div>
           </div>
 
@@ -4039,7 +4039,7 @@ export default function SeriesHarvesterPage() {
           )}
         >
           <Layers size={14} />
-          <span style={{ backgroundColor: "#ff0000" }}>123HDTV</span>
+          <span style={{ backgroundColor: "#ff0000" }}>PLAYIDTV SCRIPT</span>
         </button>
 
         <button
@@ -4217,7 +4217,7 @@ export default function SeriesHarvesterPage() {
               <div className="flex items-center gap-2.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-[#58A6FF] animate-pulse" />
                 <h2 className="text-xs font-bold tracking-wider uppercase text-gray-200 font-mono">
-                  {activeTab === "okserietv" || activeTab === "kubhd24" ? "OKSerieTV Config" : activeTab === "123hdtv" ? "123HDTV Config Parameters" : activeTab === "ezmovie" ? "EzMovie Config" : activeTab === "wowdrama" ? "WOW-Drama Config" : activeTab === "w3u" ? "W3U Converter Config" : "Doo-Nang Config"}
+                  {activeTab === "okserietv" || activeTab === "kubhd24" ? "OKSerieTV Config" : activeTab === "123hdtv" ? "PLAYIDTV SCRIPT Config Parameters" : activeTab === "ezmovie" ? "EzMovie Config" : activeTab === "wowdrama" ? "WOW-Drama Config" : activeTab === "w3u" ? "W3U Converter Config" : "Doo-Nang Config"}
                 </h2>
               </div>
               <button 
@@ -4299,12 +4299,12 @@ export default function SeriesHarvesterPage() {
                 </>
               )}
 
-              {/* 123HDTV Configuration Forms */}
+              {/* PLAYIDTV SCRIPT Configuration Forms */}
               {activeTab === "123hdtv" && (
                 <div className="flex flex-col gap-3 pt-1">
                   {/* Mode Selector Option */}
                   <div className="flex flex-col gap-1.5 pb-2 border-b border-[#2D333B]/60 font-mono">
-                    <label className="text-[10px] text-gray-400 uppercase tracking-wider">โหมดการขุดข้อมูล (Harvester Mode)</label>
+                    <label className="text-[10px] text-gray-400 uppercase tracking-wider">โหมดการขุดข้อมูล (PLAYIDTV Script Mode)</label>
                     <div className="flex gap-2">
                       <button
                         type="button"
@@ -4423,11 +4423,11 @@ export default function SeriesHarvesterPage() {
                         />
                       </div>
 
-                      {/* Download / Export W3U & M3U for 123HD */}
+                      {/* Download / Export W3U & M3U for PLAYIDTV SCRIPT */}
                       {(generatedM3U123 || generatedW3U123 || seriesList123.length > 0) && (
                         <div className="flex flex-col gap-2 p-2.5 bg-[#161B22]/80 border border-[#58A6FF]/30 rounded font-mono">
                           <span className="text-[10px] text-[#58A6FF] font-bold uppercase tracking-wider flex items-center gap-1">
-                            <span>📦</span> ไฟล์ผลลัพธ์ 123HDTV พร้อมใช้งาน
+                            <span>📦</span> ไฟล์ผลลัพธ์ PLAYIDTV SCRIPT พร้อมใช้งาน
                           </span>
                           <div className="grid grid-cols-2 gap-2">
                             <button
@@ -4469,7 +4469,7 @@ export default function SeriesHarvesterPage() {
                               onClick={() => {
                                 const content = generatedM3U123 || generateMergedM3U();
                                 copyToClipboard(content, "123-m3u-all");
-                                addLog(`📋 คัดลอก M3U ของ 123HDTV แล้ว!`, "success");
+                                addLog(`📋 คัดลอก M3U ของ PLAYIDTV SCRIPT แล้ว!`, "success");
                               }}
                               className="py-1 px-2 bg-[#21262D] hover:bg-[#30363D] text-gray-200 border border-[#30363D] rounded text-[9px] flex items-center justify-center gap-1 cursor-pointer"
                             >
@@ -4482,7 +4482,7 @@ export default function SeriesHarvesterPage() {
                               onClick={() => {
                                 const content = generatedW3U123 || JSON.stringify(seriesList123, null, 2);
                                 copyToClipboard(content, "123-w3u-all");
-                                addLog(`📋 คัดลอก W3U (JSON) ของ 123HDTV แล้ว!`, "success");
+                                addLog(`📋 คัดลอก W3U (JSON) ของ PLAYIDTV SCRIPT แล้ว!`, "success");
                               }}
                               className="py-1 px-2 bg-[#21262D] hover:bg-[#30363D] text-gray-200 border border-[#30363D] rounded text-[9px] flex items-center justify-center gap-1 cursor-pointer"
                             >
